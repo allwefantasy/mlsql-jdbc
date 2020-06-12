@@ -10,23 +10,50 @@ import net.sf.json.JSONObject
 import tech.mlsql.api.jdbc.metadata.MLSQLResultSetMetaData
 import tech.mlsql.api.jdbc.resultset.MLSQLResultSet
 import tech.mlsql.api.jdbc.{MLSQLConnection, MLSQLConst, MLSQLRestIO}
+import tech.mlsql.common.utils.base.CharMatcher
+import tech.mlsql.common.utils.escape.Escapers
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * 11/6/2020 WilliamZhu(allwefantasy@gmail.com)
  */
 class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection) extends MLSQLAbsStatement(_sql, _conn) with PreparedStatement {
-  private val parameters = mutable.HashMap()
+  private val parameters = mutable.HashMap[Int, Any]()
+
 
   override def execute(): Boolean = ???
 
   override def executeQuery(): ResultSet = {
-    val respJsonStr = MLSQLRestIO.internalExecuteQuery(_sql, _conn.props(MLSQLConst.PROP_USER), _conn.props)
+    val maxIndex = parameters.map { case (index, item) => index }.max
+    val parametersAB = ArrayBuffer[Any]()
+    (1 until maxIndex + 1).map { index =>
+      if (parameters.contains(index)) {
+        parametersAB += parameters(index)
+      } else {
+        parametersAB += WNull()
+      }
+    }
+
+    var sql = _sql
+    parametersAB.foreach { item =>
+      if (item.isInstanceOf[WNull]) {
+        sql = sql.replaceFirst("\\?", "")
+      } else {
+        val str = if (item.isInstanceOf[String]) {
+          s"'${CharMatcher.is('\'').replaceFrom(item.toString,"\\\\'")}'"
+        } else item.toString
+        sql = sql.replaceFirst("\\?", str)
+      }
+
+    }
+    println(sql)
+    val respJsonStr = MLSQLRestIO.internalExecuteQuery(sql, _conn.props(MLSQLConst.PROP_USER), _conn.props)
     val dataWithSchema = JSONObject.fromObject(respJsonStr)
     val schema = dataWithSchema.getJSONObject("schema")
     val meta = new MLSQLResultSetMetaData(schema.getJSONArray("fields"))
-    val rs = new MLSQLResultSet(dataWithSchema, meta,_conn)
+    val rs = new MLSQLResultSet(dataWithSchema, meta, _conn)
     rs
   }
 
@@ -34,31 +61,33 @@ class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection) extends MLSQL
 
   override def setNull(parameterIndex: Int, sqlType: Int): Unit = ???
 
-  override def setBoolean(parameterIndex: Int, x: Boolean): Unit = ???
+  override def setBoolean(parameterIndex: Int, x: Boolean): Unit = parameters.put(parameterIndex, x)
 
-  override def setByte(parameterIndex: Int, x: Byte): Unit = ???
+  override def setByte(parameterIndex: Int, x: Byte): Unit = parameters.put(parameterIndex, x)
 
-  override def setShort(parameterIndex: Int, x: Short): Unit = ???
+  override def setShort(parameterIndex: Int, x: Short): Unit = parameters.put(parameterIndex, x)
 
-  override def setInt(parameterIndex: Int, x: Int): Unit = ???
+  override def setInt(parameterIndex: Int, x: Int): Unit = parameters.put(parameterIndex, x)
 
-  override def setLong(parameterIndex: Int, x: Long): Unit = ???
+  override def setLong(parameterIndex: Int, x: Long): Unit = parameters.put(parameterIndex, x)
 
-  override def setFloat(parameterIndex: Int, x: Float): Unit = ???
+  override def setFloat(parameterIndex: Int, x: Float): Unit = parameters.put(parameterIndex, x)
 
-  override def setDouble(parameterIndex: Int, x: Double): Unit = ???
+  override def setDouble(parameterIndex: Int, x: Double): Unit = parameters.put(parameterIndex, x)
 
   override def setBigDecimal(parameterIndex: Int, x: java.math.BigDecimal): Unit = ???
 
-  override def setString(parameterIndex: Int, x: String): Unit = ???
+  override def setString(parameterIndex: Int, x: String): Unit = {
+    parameters.put(parameterIndex, x)
+  }
 
-  override def setBytes(parameterIndex: Int, x: Array[Byte]): Unit = ???
+  override def setBytes(parameterIndex: Int, x: Array[Byte]): Unit = parameters.put(parameterIndex, x)
 
-  override def setDate(parameterIndex: Int, x: Date): Unit = ???
+  override def setDate(parameterIndex: Int, x: Date): Unit = parameters.put(parameterIndex, x)
 
-  override def setTime(parameterIndex: Int, x: Time): Unit = ???
+  override def setTime(parameterIndex: Int, x: Time): Unit = parameters.put(parameterIndex, x)
 
-  override def setTimestamp(parameterIndex: Int, x: Timestamp): Unit = ???
+  override def setTimestamp(parameterIndex: Int, x: Timestamp): Unit = parameters.put(parameterIndex, x)
 
   override def setAsciiStream(parameterIndex: Int, x: InputStream, length: Int): Unit = ???
 
@@ -66,7 +95,7 @@ class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection) extends MLSQL
 
   override def setBinaryStream(parameterIndex: Int, x: InputStream, length: Int): Unit = ???
 
-  override def clearParameters(): Unit = ???
+  override def clearParameters(): Unit = parameters.clear()
 
   override def setObject(parameterIndex: Int, x: Any, targetSqlType: Int): Unit = ???
 
@@ -142,7 +171,7 @@ class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection) extends MLSQL
   override def executeUpdate(sql: String): Int = ???
 
   override def close(): Unit = {
-     _isClosed = true
+    _isClosed = true
   }
 
   override def getMaxFieldSize: Int = ???
@@ -227,3 +256,5 @@ class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection) extends MLSQL
 
   override def isWrapperFor(iface: Class[_]): Boolean = ???
 }
+
+case class WNull()

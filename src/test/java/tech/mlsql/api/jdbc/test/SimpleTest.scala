@@ -14,8 +14,11 @@ class SimpleTest extends FunSuite {
     val conn = DriverManager.getConnection("jdbc:mlsql://127.0.0.1:9003/test?user=william&password=xxx", new Properties())
     val stat = conn.prepareStatement(
       """
-        |select 1 as a,TIMESTAMP("2017-07-23 00:00:00") as k, current_date() as v as b;
+        |select 1 as a,TIMESTAMP("2017-07-23 00:00:00") as k, current_date() as v, "wow'" as jack as b;
+        |select * from b where a=? and jack=? as output;
         |""".stripMargin)
+    stat.setInt(1, 1)
+    stat.setString(2, "wow'")
     val rs = stat.executeQuery()
     while (rs.next()) {
       println(rs.getString("a"))
