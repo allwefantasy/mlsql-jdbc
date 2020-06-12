@@ -1,6 +1,5 @@
 package tech.mlsql.api.jdbc
 
-import net.sf.json.JSONObject
 import org.apache.http.client.fluent.{Form, Request}
 
 /**
@@ -9,23 +8,20 @@ import org.apache.http.client.fluent.{Form, Request}
 object MLSQLRestIO {
   def internalExecuteQuery(sql: String, user: String, properties: Map[String, String]) = {
 
+    val form = Form.form()
+    properties.foreach { case (k, v) => form.add(k, v) }
+
     val respJson = Request.Post(s"http://${properties(MLSQLConst.PROP_HOST)}:${properties(MLSQLConst.PROP_PORT)}/run/script").
-      connectTimeout(1000 * 60 * 60).
-      socketTimeout(1000 * 60 * 60 * 60).
+      connectTimeout(properties.getOrElse("connectTimeout", 1000 * 60 * 60).toString.toInt).
+      socketTimeout(properties.getOrElse("socketTimeout", 1000 * 60 * 60 * 60).toString.toInt).
       bodyForm(
-        Form.form().
+        form.
           add("owner", user).
           add("sql", sql).
           add("sessionPerUser", "true").
           add("includeSchema", "true").
           build()
       ).execute().returnContent().asString()
-
-    //{ "schema":{"type":"struct","fields":[{"name":"a","type":"integer","nullable":false,"metadata":{}}]},"data": [{"a":1}]}
-    val resp = JSONObject.fromObject(respJson)
-    //DataTypeUtil.convertToResultSet(resp.getJSONArray("data").asScala.map(_.toString), resp.getJSONObject("schema").toString)
-
-    //    new MLSQLResultSet(resp)
     respJson
   }
 

@@ -26,7 +26,7 @@ class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection) extends MLSQL
     val dataWithSchema = JSONObject.fromObject(respJsonStr)
     val schema = dataWithSchema.getJSONObject("schema")
     val meta = new MLSQLResultSetMetaData(schema.getJSONArray("fields"))
-    val rs = new MLSQLResultSet(dataWithSchema, meta)
+    val rs = new MLSQLResultSet(dataWithSchema, meta,_conn)
     rs
   }
 

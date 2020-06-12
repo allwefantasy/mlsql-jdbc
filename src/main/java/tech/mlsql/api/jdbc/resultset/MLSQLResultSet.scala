@@ -3,23 +3,32 @@ package tech.mlsql.api.jdbc.resultset
 import java.io.{InputStream, Reader}
 import java.net.URL
 import java.sql.{Blob, Clob, Date, NClob, Ref, ResultSet, ResultSetMetaData, RowId, SQLException, SQLWarning, SQLXML, Statement, Time, Timestamp}
-import java.util.Calendar
+import java.util.{Calendar, Locale, TimeZone}
 import java.{sql, util}
 
 import net.sf.json.JSONObject
+import org.apache.commons.lang3.time.FastDateFormat
+import tech.mlsql.api.jdbc.MLSQLConnection
 
 import scala.collection.JavaConverters._
 
 /**
  * 12/6/2020 WilliamZhu(allwefantasy@gmail.com)
  */
-class MLSQLResultSet(dataWithSchema: JSONObject, metaData: ResultSetMetaData) extends ResultSet {
+class MLSQLResultSet(dataWithSchema: JSONObject, metaData: ResultSetMetaData, _conn: MLSQLConnection) extends ResultSet {
 
   private val schema = dataWithSchema.getJSONObject("schema").getJSONArray("fields")
   private val fields = schema.asScala.map(_.asInstanceOf[JSONObject].getString("name")).toList
   private val data = dataWithSchema.getJSONArray("data")
   private var pos = -1
   private var _isClosed = false
+  private val parameters = _conn.props
+  private val timeZone = TimeZone.getTimeZone(parameters.getOrElse("timeZone", "UTC"))
+
+  private val timestampFormat = FastDateFormat.getInstance(
+    parameters.getOrElse("timestampFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"), timeZone, Locale.US)
+  private val dateFormat = FastDateFormat.getInstance(parameters.getOrElse("dateFormat", "yyyy-MM-dd"), Locale.US)
+
 
   override def next(): Boolean = {
     pos += 1
@@ -58,11 +67,19 @@ class MLSQLResultSet(dataWithSchema: JSONObject, metaData: ResultSetMetaData) ex
 
   override def getBytes(columnIndex: Int): Array[Byte] = getString(columnIndex).getBytes
 
-  override def getDate(columnIndex: Int): Date = Date.valueOf(getString(columnIndex))
+  override def getDate(columnIndex: Int): Date = {
+    val stringValue = getString(columnIndex)
+    new java.sql.Date(dateFormat.parse(stringValue).getTime)
+  }
 
-  override def getTime(columnIndex: Int): Time = Time.valueOf(getString(columnIndex))
+  override def getTime(columnIndex: Int): Time = {
+    Time.valueOf(getString(columnIndex))
+  }
 
-  override def getTimestamp(columnIndex: Int): Timestamp = Timestamp.valueOf(getString(columnIndex))
+  override def getTimestamp(columnIndex: Int): Timestamp = {
+    val stringValue = getString(columnIndex)
+    new Timestamp(timestampFormat.parse(stringValue).getTime)
+  }
 
   override def getAsciiStream(columnIndex: Int): InputStream = ???
 
