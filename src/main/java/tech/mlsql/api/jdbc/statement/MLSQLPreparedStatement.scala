@@ -4,14 +4,13 @@ import java.io.{InputStream, Reader}
 import java.net.URL
 import java.sql
 import java.sql.{Blob, Clob, Connection, Date, NClob, ParameterMetaData, PreparedStatement, Ref, ResultSet, ResultSetMetaData, RowId, SQLWarning, SQLXML, Time, Timestamp}
-import java.util.Calendar
+import java.util.{Calendar, UUID}
 
 import net.sf.json.JSONObject
 import tech.mlsql.api.jdbc.metadata.MLSQLResultSetMetaData
 import tech.mlsql.api.jdbc.resultset.MLSQLResultSet
 import tech.mlsql.api.jdbc.{MLSQLConnection, MLSQLConst, MLSQLRestIO}
 import tech.mlsql.common.utils.base.CharMatcher
-import tech.mlsql.common.utils.escape.Escapers
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -26,29 +25,34 @@ class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection) extends MLSQL
   override def execute(): Boolean = ???
 
   override def executeQuery(): ResultSet = {
-    val maxIndex = parameters.map { case (index, item) => index }.max
-    val parametersAB = ArrayBuffer[Any]()
-    (1 until maxIndex + 1).map { index =>
-      if (parameters.contains(index)) {
-        parametersAB += parameters(index)
-      } else {
-        parametersAB += WNull()
-      }
-    }
-
     var sql = _sql
-    parametersAB.foreach { item =>
-      if (item.isInstanceOf[WNull]) {
-        sql = sql.replaceFirst("\\?", "")
-      } else {
-        val str = if (item.isInstanceOf[String]) {
-          s"'${CharMatcher.is('\'').replaceFrom(item.toString,"\\\\'")}'"
-        } else item.toString
-        sql = sql.replaceFirst("\\?", str)
+    if (!parameters.isEmpty) {
+      val maxIndex = parameters.map { case (index, item) => index }.max
+      val parametersAB = ArrayBuffer[Any]()
+      (1 until maxIndex + 1).map { index =>
+        if (parameters.contains(index)) {
+          parametersAB += parameters(index)
+        } else {
+          parametersAB += WNull()
+        }
       }
+      parametersAB.foreach { item =>
+        if (item.isInstanceOf[WNull]) {
+          sql = sql.replaceFirst("\\?", "")
+        } else {
+          val str = if (item.isInstanceOf[String]) {
+            s"'${CharMatcher.is('\'').replaceFrom(item.toString, "\\\\'")}'"
+          } else item.toString
+          sql = sql.replaceFirst("\\?", str)
+        }
 
+      }
     }
-    println(sql)
+
+
+    if (_conn.props.getOrElse("sqlType", "standard") == "standard") {
+      sql = s"${sql} as ${UUID.randomUUID().toString.replaceAll("-", "")};"
+    }
     val respJsonStr = MLSQLRestIO.internalExecuteQuery(sql, _conn.props(MLSQLConst.PROP_USER), _conn.props)
     val dataWithSchema = JSONObject.fromObject(respJsonStr)
     val schema = dataWithSchema.getJSONObject("schema")
