@@ -3,6 +3,10 @@
 [MLSQL](https://www.mlsql.tech) 是一门优秀的面向大数据和AI的语言。 该项目使得其支持JDBC协议。该驱动会自动将jdbc请求转化为MLSQL 识别的的
 Rest请求并返回符合JDBC格式的数据。
 
+## 当前状态
+
+正在积极开发，还未发布稳定版本
+
 ## 标准Spark SQL
 
 ```scala
