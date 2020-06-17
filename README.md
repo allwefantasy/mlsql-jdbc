@@ -7,6 +7,14 @@ Rest请求并返回符合JDBC格式的数据。
 
 正在积极开发，还未发布稳定版本
 
+```xml
+<dependency>
+    <groupId>tech.mlsql.api.jdbc</groupId>
+    <artifactId>mlsql-jdbc</artifactId>
+    <version>0.1.0</version>
+</<dependency>
+```
+
 ## 标准Spark SQL
 
 ```scala
