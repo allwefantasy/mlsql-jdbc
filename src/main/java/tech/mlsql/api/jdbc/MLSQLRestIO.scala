@@ -12,8 +12,8 @@ object MLSQLRestIO {
     properties.foreach { case (k, v) => form.add(k, v) }
 
     val respJson = Request.Post(s"http://${properties(MLSQLConst.PROP_HOST)}:${properties(MLSQLConst.PROP_PORT)}/run/script").
-      connectTimeout(properties.getOrElse("connectTimeout", 1000 * 60 * 60).toString.toInt).
-      socketTimeout(properties.getOrElse("socketTimeout", 1000 * 60 * 60 * 60).toString.toInt).
+      connectTimeout(properties.getOrElse(MLSQLConst.PROP_CONNECT_TIMEOUT, 1000 * 60 * 60).toString.toInt).
+      socketTimeout(properties.getOrElse(MLSQLConst.PROP_SOCKET_TIMEOUT, 1000 * 60 * 60 * 60).toString.toInt).
       bodyForm(
         form.
           add("owner", user).

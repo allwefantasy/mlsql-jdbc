@@ -49,7 +49,10 @@ import org.scalatest.FunSuite
 class SimpleTest extends FunSuite {
   test("simple") {
     Class.forName("tech.mlsql.api.jdbc.MLSQLDriver")
-    val conn = DriverManager.getConnection("jdbc:mlsql://127.0.0.1:9003/test?user=william&password=xxx", new Properties())
+    val properties = new Properties()
+    properties.put("sqlType", "mlsql")
+    val conn = DriverManager.getConnection("jdbc:mlsql://127.0.0.1:9003/test?user=william&password=xxx", properties)
+
     val stat = conn.prepareStatement(
       """
         |select 1 as a,TIMESTAMP("2017-07-23 00:00:00") as k, current_date() as v, "wow'" as jack as b;
@@ -70,5 +73,12 @@ class SimpleTest extends FunSuite {
 }
 
 ```
+
+## 如何实现鉴权
+
+MLSQL Engine本身不支持鉴权。不过用户有两种方式实现鉴权：
+
+1. MLSQL JDBC访问HTTP代理服务而不是直接访问MLSQL Engine.代理服务会实现鉴权。
+2. 开发基于MLSQL Engine的鉴权插件，未来官方也可能会直接提供。
 
 

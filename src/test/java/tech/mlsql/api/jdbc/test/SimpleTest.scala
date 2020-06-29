@@ -11,7 +11,9 @@ import org.scalatest.FunSuite
 class SimpleTest extends FunSuite {
   test("simple") {
     Class.forName("tech.mlsql.api.jdbc.MLSQLDriver")
-    val conn = DriverManager.getConnection("jdbc:mlsql://127.0.0.1:9003/test?user=william&password=xxx", new Properties())
+    val properties = new Properties()
+    properties.put("sqlType", "mlsql")
+    val conn = DriverManager.getConnection("jdbc:mlsql://127.0.0.1:9003/test?user=william&password=xxx", properties)
     val stat = conn.prepareStatement(
       """
         |select 1 as a,TIMESTAMP("2017-07-23 00:00:00") as k, current_date() as v, "wow'" as jack as b;

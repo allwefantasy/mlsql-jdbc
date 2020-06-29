@@ -117,23 +117,23 @@
             <version>3.0.3</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>net.liftweb</groupId>
-            <artifactId>lift-json_${scala.binary.version}</artifactId>
-            <version>3.3.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>net.liftweb</groupId>-->
+<!--            <artifactId>lift-json_${scala.binary.version}</artifactId>-->
+<!--            <version>3.3.0</version>-->
+<!--        </dependency>-->
 
-        <!--        <dependency>-->
-        <!--            <groupId>com.fasterxml.jackson.module</groupId>-->
-        <!--            <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>-->
-        <!--            <version>2.6.5</version>-->
-        <!--        </dependency>-->
+<!--        &lt;!&ndash;        <dependency>&ndash;&gt;-->
+<!--        &lt;!&ndash;            <groupId>com.fasterxml.jackson.module</groupId>&ndash;&gt;-->
+<!--        &lt;!&ndash;            <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>&ndash;&gt;-->
+<!--        &lt;!&ndash;            <version>2.6.5</version>&ndash;&gt;-->
+<!--        &lt;!&ndash;        </dependency>&ndash;&gt;-->
 
-        <dependency>
-            <groupId>net.liftweb</groupId>
-            <artifactId>lift-json-ext_${scala.binary.version}</artifactId>
-            <version>3.3.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>net.liftweb</groupId>-->
+<!--            <artifactId>lift-json-ext_${scala.binary.version}</artifactId>-->
+<!--            <version>3.3.0</version>-->
+<!--        </dependency>-->
 
     </dependencies>
     <profiles>

@@ -19,4 +19,7 @@ public class MLSQLConst {
     public static String PROP_PATH = "path";
     public static String PROP_USER = "user";
     public static String PROP_PASSWORD = "password";
+
+    public static String PROP_CONNECT_TIMEOUT = "connectTimeout";
+    public static String PROP_SOCKET_TIMEOUT = "socketTimeout";
 }
