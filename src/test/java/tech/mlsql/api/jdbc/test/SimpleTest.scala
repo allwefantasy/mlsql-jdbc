@@ -4,6 +4,7 @@ import java.sql.DriverManager
 import java.util.Properties
 
 import org.scalatest.FunSuite
+import tech.mlsql.api.jdbc.Utils
 
 /**
  * 11/6/2020 WilliamZhu(allwefantasy@gmail.com)
@@ -42,7 +43,7 @@ class SimpleTest extends FunSuite {
     //    val rs = stat.executeQuery()
     while (rs.next()) {
 //      println(rs.getString(1))
-      println(rs.getString(1))
+      println(rs.getString(7))
       //      println(rs.getDate("v"))
     }
     rs.close()
@@ -52,17 +53,30 @@ class SimpleTest extends FunSuite {
 
   test("simple3") {
     Class.forName("tech.mlsql.api.jdbc.MLSQLDriver")
-    val conn = DriverManager.getConnection("jdbc:mlsql://127.0.0.1:9003/test?user=william&password=xxx", new Properties())
+    val conn = DriverManager.getConnection("jdbc:mlsql://127.0.0.1:9003/test?user=william&password=xxx&access_token=mlsql", new Properties())
     val stat = conn.prepareStatement(
       """
         |show databases
         |""".stripMargin)
     val rs = stat.executeQuery()
     while (rs.next()) {
-      println(rs.getString(0))
+      println(rs.getString(1))
     }
     rs.close()
     stat.close()
+    conn.close()
+  }
+  test("simple4") {
+    Class.forName("com.mysql.jdbc.Driver")
+    val prop = new Properties()
+    prop.put("user","root")
+    prop.put("password","mlsql")
+    val conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/wow?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false", prop)
+    val rs = conn.getMetaData.getCatalogs
+//    println(Utils.rsToMaps(rs))
+    rs.next()
+    println(rs.getString(1))
+    rs.close()
     conn.close()
   }
 }

@@ -18,7 +18,7 @@ import scala.collection.JavaConverters._
 class MLSQLResultSet(dataWithSchema: JSONObject, metaData: ResultSetMetaData, _conn: MLSQLConnection) extends ResultSet {
 
   private val schema = dataWithSchema.getJSONObject("schema").getJSONArray("fields")
-  private val fields = schema.asScala.map(_.asInstanceOf[JSONObject].getString("name")).toList
+  private val _fields = schema.asScala.map(_.asInstanceOf[JSONObject].getString("name")).toList
   private val data = dataWithSchema.getJSONArray("data")
   private var pos = -1
   private var _isClosed = false
@@ -29,6 +29,11 @@ class MLSQLResultSet(dataWithSchema: JSONObject, metaData: ResultSetMetaData, _c
     parameters.getOrElse("timestampFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"), timeZone, Locale.US)
   private val dateFormat = FastDateFormat.getInstance(parameters.getOrElse("dateFormat", "yyyy-MM-dd"), Locale.US)
 
+  private def fields(index: Int) = _fields(index - 1)
+
+  private def indexOf(name: String) = {
+    _fields.indexOf(name) + 1
+  }
 
   override def next(): Boolean = {
     pos += 1
@@ -87,37 +92,37 @@ class MLSQLResultSet(dataWithSchema: JSONObject, metaData: ResultSetMetaData, _c
 
   override def getBinaryStream(columnIndex: Int): InputStream = ???
 
-  override def getString(columnLabel: String): String = getString(fields.indexOf(columnLabel))
+  override def getString(columnLabel: String): String = getString(indexOf(columnLabel))
 
-  override def getBoolean(columnLabel: String): Boolean = getBoolean(fields.indexOf(columnLabel))
+  override def getBoolean(columnLabel: String): Boolean = getBoolean(indexOf(columnLabel))
 
-  override def getByte(columnLabel: String): Byte = getByte(fields.indexOf(columnLabel))
+  override def getByte(columnLabel: String): Byte = getByte(indexOf(columnLabel))
 
-  override def getShort(columnLabel: String): Short = getShort(fields.indexOf(columnLabel))
+  override def getShort(columnLabel: String): Short = getShort(indexOf(columnLabel))
 
-  override def getInt(columnLabel: String): Int = getInt(fields.indexOf(columnLabel))
+  override def getInt(columnLabel: String): Int = getInt(indexOf(columnLabel))
 
-  override def getLong(columnLabel: String): Long = getLong(fields.indexOf(columnLabel))
+  override def getLong(columnLabel: String): Long = getLong(indexOf(columnLabel))
 
-  override def getFloat(columnLabel: String): Float = getFloat(fields.indexOf(columnLabel))
+  override def getFloat(columnLabel: String): Float = getFloat(indexOf(columnLabel))
 
-  override def getDouble(columnLabel: String): Double = getDouble(fields.indexOf(columnLabel))
+  override def getDouble(columnLabel: String): Double = getDouble(indexOf(columnLabel))
 
-  override def getBigDecimal(columnLabel: String, scale: Int): java.math.BigDecimal = getBigDecimal(fields.indexOf(columnLabel))
+  override def getBigDecimal(columnLabel: String, scale: Int): java.math.BigDecimal = getBigDecimal(indexOf(columnLabel))
 
-  override def getBytes(columnLabel: String): Array[Byte] = getBytes(fields.indexOf(columnLabel))
+  override def getBytes(columnLabel: String): Array[Byte] = getBytes(indexOf(columnLabel))
 
-  override def getDate(columnLabel: String): Date = getDate(fields.indexOf(columnLabel))
+  override def getDate(columnLabel: String): Date = getDate(indexOf(columnLabel))
 
-  override def getTime(columnLabel: String): Time = getTime(fields.indexOf(columnLabel))
+  override def getTime(columnLabel: String): Time = getTime(indexOf(columnLabel))
 
-  override def getTimestamp(columnLabel: String): Timestamp = getTimestamp(fields.indexOf(columnLabel))
+  override def getTimestamp(columnLabel: String): Timestamp = getTimestamp(indexOf(columnLabel))
 
-  override def getAsciiStream(columnLabel: String): InputStream = getAsciiStream(fields.indexOf(columnLabel))
+  override def getAsciiStream(columnLabel: String): InputStream = getAsciiStream(indexOf(columnLabel))
 
-  override def getUnicodeStream(columnLabel: String): InputStream = getUnicodeStream(fields.indexOf(columnLabel))
+  override def getUnicodeStream(columnLabel: String): InputStream = getUnicodeStream(indexOf(columnLabel))
 
-  override def getBinaryStream(columnLabel: String): InputStream = getBinaryStream(fields.indexOf(columnLabel))
+  override def getBinaryStream(columnLabel: String): InputStream = getBinaryStream(indexOf(columnLabel))
 
   override def getWarnings: SQLWarning = null
 
@@ -133,10 +138,10 @@ class MLSQLResultSet(dataWithSchema: JSONObject, metaData: ResultSetMetaData, _c
     getRowObj.get(columnIndex)
   }
 
-  override def getObject(columnLabel: String): AnyRef = getObject(fields.indexOf(columnLabel))
+  override def getObject(columnLabel: String): AnyRef = getObject(indexOf(columnLabel))
 
   override def findColumn(columnLabel: String): Int = {
-    fields.indexOf(columnLabel)
+    indexOf(columnLabel)
   }
 
   override def getCharacterStream(columnIndex: Int): Reader = ???
@@ -145,7 +150,7 @@ class MLSQLResultSet(dataWithSchema: JSONObject, metaData: ResultSetMetaData, _c
 
   override def getBigDecimal(columnIndex: Int): java.math.BigDecimal = getBigDecimal(columnIndex, 0)
 
-  override def getBigDecimal(columnLabel: String): java.math.BigDecimal = getBigDecimal(fields.indexOf(columnLabel))
+  override def getBigDecimal(columnLabel: String): java.math.BigDecimal = getBigDecimal(indexOf(columnLabel))
 
   override def isBeforeFirst: Boolean = {
     checkIfClosed()
@@ -359,11 +364,11 @@ class MLSQLResultSet(dataWithSchema: JSONObject, metaData: ResultSetMetaData, _c
 
   override def getClob(columnLabel: String): Clob = ???
 
-  override def getArray(columnLabel: String): sql.Array = getArray(fields.indexOf(columnLabel))
+  override def getArray(columnLabel: String): sql.Array = getArray(indexOf(columnLabel))
 
   override def getDate(columnIndex: Int, cal: Calendar): Date = getDate(columnIndex)
 
-  override def getDate(columnLabel: String, cal: Calendar): Date = getDate(fields.indexOf(columnLabel))
+  override def getDate(columnLabel: String, cal: Calendar): Date = getDate(indexOf(columnLabel))
 
   override def getTime(columnIndex: Int, cal: Calendar): Time = getTime(columnIndex)
 
