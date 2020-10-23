@@ -37,9 +37,9 @@ class MLSQLDatabaseMetaData(userName: String, url: String) extends DatabaseMetaD
 
   override def nullsAreSortedAtEnd(): Boolean = ???
 
-  override def getDatabaseProductName: String = ???
+  override def getDatabaseProductName: String = MLSQLConst.PRODUCT_NAME
 
-  override def getDatabaseProductVersion: String = ???
+  override def getDatabaseProductVersion: String = MLSQLConst.PRODUCT_VERSION
 
 
   override def usesLocalFiles(): Boolean = ???
@@ -328,13 +328,13 @@ class MLSQLDatabaseMetaData(userName: String, url: String) extends DatabaseMetaD
 
   override def getResultSetHoldability: Int = ???
 
-  override def getDatabaseMajorVersion: Int = ???
+  override def getDatabaseMajorVersion: Int = MLSQLConst.MAJOR_VERSION
 
-  override def getDatabaseMinorVersion: Int = ???
+  override def getDatabaseMinorVersion: Int = MLSQLConst.MINOR_VERSION
 
-  override def getJDBCMajorVersion: Int = ???
+  override def getJDBCMajorVersion: Int = MLSQLConst.MAJOR_VERSION
 
-  override def getJDBCMinorVersion: Int = ???
+  override def getJDBCMinorVersion: Int = MLSQLConst.MINOR_VERSION
 
   override def getSQLStateType: Int = ???
 

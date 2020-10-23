@@ -9,6 +9,9 @@ public class MLSQLConst {
     public static int MINOR_VERSION = 0;
     public static int DEFAULT_PORT = 9003;
     public static String DRIVER_NAME = "MLSQL";
+    public static String PRODUCT_NAME = "MLSQL";
+    public static String PRODUCT_VERSION = "0.1";
+
 
     public static int MAX_SIZE = 1024;
 
