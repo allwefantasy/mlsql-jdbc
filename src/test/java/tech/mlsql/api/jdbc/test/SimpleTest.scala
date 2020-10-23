@@ -38,11 +38,11 @@ class SimpleTest extends FunSuite {
       """
         |select 1 as a,TIMESTAMP("2017-07-23 00:00:00") as k, current_date() as v, "wow'" as jack
         |""".stripMargin)
-    val rs = conn.getMetaData.getCatalogs
+    val rs = conn.getMetaData.getTables("default","","",Array())
     //    val rs = stat.executeQuery()
     while (rs.next()) {
-      println(rs.getString(0))
-      //      println(rs.getTimestamp("k"))
+//      println(rs.getString(1))
+      println(rs.getString(1))
       //      println(rs.getDate("v"))
     }
     rs.close()
