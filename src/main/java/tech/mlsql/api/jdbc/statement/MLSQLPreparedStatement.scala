@@ -51,7 +51,7 @@ class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection) extends MLSQL
 
 
     if (_conn.props.getOrElse("sqlType", "standard") == "standard") {
-      sql = s"${sql} as ${UUID.randomUUID().toString.replaceAll("-", "")};"
+      sql = s"!profiler sql ''' ${sql} ''';"
     }
     val respJsonStr = MLSQLRestIO.internalExecuteQuery(sql, _conn.props(MLSQLConst.PROP_USER), _conn.props)
     val dataWithSchema = JSONObject.fromObject(respJsonStr)

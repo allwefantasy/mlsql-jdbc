@@ -48,4 +48,20 @@ class SimpleTest extends FunSuite {
     stat.close()
     conn.close()
   }
+
+  test("simple3") {
+    Class.forName("tech.mlsql.api.jdbc.MLSQLDriver")
+    val conn = DriverManager.getConnection("jdbc:mlsql://127.0.0.1:9003/test?user=william&password=xxx", new Properties())
+    val stat = conn.prepareStatement(
+      """
+        |show databases
+        |""".stripMargin)
+    val rs = stat.executeQuery()
+    while (rs.next()) {
+      println(rs.getString(0))
+    }
+    rs.close()
+    stat.close()
+    conn.close()
+  }
 }
