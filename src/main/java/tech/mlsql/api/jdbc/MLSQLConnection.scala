@@ -42,7 +42,7 @@ class MLSQLConnection(val props: Map[String, String]) extends Connection {
   override def isClosed: Boolean = _isClosed
 
   override def getMetaData: DatabaseMetaData = {
-    new MLSQLDatabaseMetaData(props(MLSQLConst.PROP_USER), "")
+    new MLSQLDatabaseMetaData(props(MLSQLConst.PROP_USER), "",this)
   }
 
   override def setReadOnly(readOnly: Boolean): Unit = ???

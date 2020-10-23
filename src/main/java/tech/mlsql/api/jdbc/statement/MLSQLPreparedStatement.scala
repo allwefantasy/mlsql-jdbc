@@ -18,7 +18,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * 11/6/2020 WilliamZhu(allwefantasy@gmail.com)
  */
-class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection) extends MLSQLAbsStatement(_sql, _conn) with PreparedStatement {
+class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection,sqlType:String="standard") extends MLSQLAbsStatement(_sql, _conn) with PreparedStatement {
   private val parameters = mutable.HashMap[Int, Any]()
 
 
@@ -50,7 +50,7 @@ class MLSQLPreparedStatement(_sql: String, _conn: MLSQLConnection) extends MLSQL
     }
 
 
-    if (_conn.props.getOrElse("sqlType", "standard") == "standard") {
+    if (_conn.props.getOrElse("sqlType", sqlType) == "standard") {
       sql = s"!profiler sql ''' ${sql} ''';"
     }
     val respJsonStr = MLSQLRestIO.internalExecuteQuery(sql, _conn.props(MLSQLConst.PROP_USER), _conn.props)

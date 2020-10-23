@@ -2,12 +2,12 @@ package tech.mlsql.api.jdbc.metadata
 
 import java.sql.{Connection, DatabaseMetaData, ResultSet, RowIdLifetime}
 
-import tech.mlsql.api.jdbc.MLSQLConst
+import tech.mlsql.api.jdbc.{MLSQLConnection, MLSQLConst}
 
 /**
  * 12/6/2020 WilliamZhu(allwefantasy@gmail.com)
  */
-class MLSQLDatabaseMetaData(userName: String, url: String) extends DatabaseMetaData {
+class MLSQLDatabaseMetaData(userName: String, url: String, conn: Connection) extends DatabaseMetaData {
 
 
   override def getDriverName: String = MLSQLConst.DRIVER_NAME
@@ -252,11 +252,27 @@ class MLSQLDatabaseMetaData(userName: String, url: String) extends DatabaseMetaD
 
   override def getProcedureColumns(catalog: String, schemaPattern: String, procedureNamePattern: String, columnNamePattern: String): ResultSet = ???
 
-  override def getTables(catalog: String, schemaPattern: String, tableNamePattern: String, types: Array[String]): ResultSet = ???
+  override def getTables(catalog: String, schemaPattern: String, tableNamePattern: String, types: Array[String]): ResultSet = {
+    val newconn = new MLSQLConnection(conn.asInstanceOf[MLSQLConnection].props ++ Map("sqlType" -> "mlsql"))
+    val stat = newconn.prepareStatement(
+      s"""
+         |!profiler sql "show tables from ${catalog}";
+         |""".stripMargin)
+    val rs = stat.executeQuery()
+    rs
+  }
 
-  override def getSchemas: ResultSet = ???
+  override def getSchemas: ResultSet = getCatalogs
 
-  override def getCatalogs: ResultSet = ???
+  override def getCatalogs: ResultSet = {
+    val newconn = new MLSQLConnection(conn.asInstanceOf[MLSQLConnection].props ++ Map("sqlType" -> "mlsql"))
+    val stat = newconn.prepareStatement(
+      """
+        |!profiler sql "show databases";
+        |""".stripMargin)
+    val rs = stat.executeQuery()
+    rs
+  }
 
   override def getTableTypes: ResultSet = ???
 
