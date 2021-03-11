@@ -32,6 +32,23 @@ class SimpleTest extends FunSuite {
     stat.close()
     conn.close()
   }
+  test("simple1") {
+    Class.forName("tech.mlsql.api.jdbc.MLSQLDriver")
+    val properties = new Properties()
+    properties.put("sqlType", "mlsql")
+    val conn = DriverManager.getConnection("jdbc:mlsql://127.0.0.1:9003/test?user=william&password=xxx&characterEncoding=utf-8", properties)
+    val stat = conn.prepareStatement(
+      """
+        |select 'MLSQLJDBC驱动' as name as tempName;
+        |""".stripMargin)
+    val rs = stat.executeQuery()
+    while (rs.next()) {
+      println(rs.getString("name"))
+    }
+    rs.close()
+    stat.close()
+    conn.close()
+  }
   test("simple2") {
     Class.forName("tech.mlsql.api.jdbc.MLSQLDriver")
     val conn = DriverManager.getConnection("jdbc:mlsql://127.0.0.1:9003/test?user=william&password=xxx&access_token=mlsql", new Properties())

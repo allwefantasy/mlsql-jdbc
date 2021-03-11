@@ -1,5 +1,7 @@
 package tech.mlsql.api.jdbc
 
+import java.nio.charset.Charset
+
 import org.apache.http.client.fluent.{Form, Request}
 
 /**
@@ -20,7 +22,7 @@ object MLSQLRestIO {
           add("sql", sql).
           add("sessionPerUser", "true").
           add("includeSchema", "true").
-          build()
+          build(),Charset.forName(properties.getOrElse("characterEncoding","ISO-8859-1"))
       ).execute().returnContent().asString()
     respJson
   }
